@@ -3,6 +3,8 @@
 name = "falcon-accounts"
 version = "0.1.0"
 edition = "2021"
+Author = "Raman Singh"
+Email = "Raman.Singh@ieee.org and Raman.Singh@uws.ac.uk"
 
 [dependencies]
 #sp-core = { git = "https://github.com/singhraman84/polkadot-sdk.git", branch = "falcon", default-features = false } 
