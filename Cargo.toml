@@ -1,0 +1,12 @@
+
+[package]
+name = "falcon-accounts"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+#sp-core = { git = "https://github.com/singhraman84/polkadot-sdk.git", branch = "falcon", default-features = false } 
+blake2 = "0.10"
+sp-core = { version = "34.0.0", features = ["full_crypto"] }
+falcon-rs = "0.2.4"
+

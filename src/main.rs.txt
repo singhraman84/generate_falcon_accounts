@@ -1,0 +1,71 @@
+use blake2::{Blake2b512, Digest};
+use falcon::prelude::*;
+use sp_core::crypto::{AccountId32, Ss58Codec};
+
+
+/// This is the seed that will be used to generate deterministic keypair, using 32 bytes at par with other DSA algorithms to retain consistency
+const SEED32: [u8; 32] = *b"12345678901234567890123456789012";
+
+
+/// Expand 32-byte seed → 48-byte Falcon seed
+fn expand_seed(seed32: &[u8]) -> [u8; 48] {
+    let mut h = Blake2b512::new();
+    h.update(seed32);
+    let out = h.finalize();
+
+    let mut seed48 = [0u8; 48];
+    seed48.copy_from_slice(&out[..48]);
+    seed48
+}
+
+/// =========================================
+/// Falcon512 deterministic keypair
+/// =========================================
+fn falcon512(seed32: &[u8]) -> FnDsaKeyPair {
+    let seed = expand_seed(seed32);
+    FnDsaKeyPair::generate_deterministic(&seed, 9)
+        .expect("Falcon512 keygen failed")
+}
+
+/// =========================================
+/// Falcon1024 deterministic keypair
+/// =========================================
+fn falcon1024(seed32: &[u8]) -> FnDsaKeyPair {
+    let seed = expand_seed(seed32);
+    FnDsaKeyPair::generate_deterministic(&seed, 10)
+        .expect("Falcon1024 keygen failed")
+}
+
+/// =========================================
+/// Convert public key → AccountId32
+/// =========================================
+fn to_accountid32(pubkey: &[u8]) -> AccountId32 {
+    let hash = sp_core::hashing::blake2_256(pubkey);
+    AccountId32::from(hash)
+}
+
+/// =========================================
+/// Main
+/// =========================================
+fn main() {
+    let kp512 = falcon512(&SEED32);
+    let kp1024 = falcon1024(&SEED32);
+
+    let acc512 = to_accountid32(kp512.public_key());
+    let acc1024 = to_accountid32(kp1024.public_key());
+
+    println!("=== RAW PUBLIC KEYS ===");
+    println!("Falcon512 pubkey:  {}", hex(kp512.public_key()));
+    println!("Falcon1024 pubkey: {}", hex(kp1024.public_key()));
+
+    println!("\n=== SS58 ACCOUNTS ===");
+    println!("Falcon512 SS58:  {}", acc512.to_ss58check());
+    println!("Falcon1024 SS58: {}", acc1024.to_ss58check());
+}
+
+/// helper hex printer
+fn hex(data: &[u8]) -> String {
+    data.iter()
+        .map(|b| format!("{:02x}", b))
+        .collect::<String>()
+}
