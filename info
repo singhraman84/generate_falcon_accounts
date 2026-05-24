@@ -1,0 +1,2 @@
+What is SS58 Address:
+An SS58 address is a standardised, base-58 encoded format used to represent a 32-byte public key on blockchain networks built on Substrate, for example, Polkadot, Kusama, and Bittensor. 
